@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Load URDF từ file xacro -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find my_robot)/urdf/robot.urdf.xacro'" />
+
+  <!-- ROS Serial -->
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="57600"/>
+  </node>
+
+  <!-- Robot State Publisher để publish TF từ URDF -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen" />
+
+  <!-- Joint State Publisher để publish trạng thái joint -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" output="screen" />
+
+  <!-- Node tính toán Odometry và publish /odom -->
+  <!--<node name="odometry_node" pkg="my_robot" type="odometry_node.py" output="screen" />-->
+
+  <!-- RViz visualization -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find my_robot)/rviz/odom_display.rviz" required="true" output="screen" />
+</launch>

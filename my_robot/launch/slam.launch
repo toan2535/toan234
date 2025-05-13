@@ -1,0 +1,34 @@
+<launch>
+  <!-- Load URDF từ file xacro -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find my_robot)/urdf/robot.urdf.xacro'" />
+
+  <!-- ROS Serial -->
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="57600"/>
+  </node>
+  <!--lidar-->
+  <param name="serial_port" value="/dev/ttyUSB0"/>
+
+  <!-- Robot State Publisher để publish TF từ URDF -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen" />
+
+  <!-- Joint State Publisher để publish trạng thái joint -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" output="screen" />
+
+  <!-- Tắt odometry_node hoặc remap -->
+  <node name="odometry_node" pkg="my_robot" type="odometry_node.py" />
+
+  <!-- SLAM -->
+  <node pkg="gmapping" type="slam_gmapping" name="gmapping">
+      <param name="base_frame"            value="base_link"/>
+      <param name="odom_frame"            value="odom" />
+      <param name="map_update_interval"   value="3.0"/>
+      <param name="maxUrange"             value="15.0"/>
+      <param name="map_frame" value="map"/>
+  </node>
+
+
+  <!-- RViz visualization -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find my_robot)/rviz/odom_display.rviz" required="true" output="screen" />
+</launch>
